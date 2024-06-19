@@ -46,7 +46,7 @@ contract RocketSignerRegistry is RocketSignerRegistryInterface {
     }
 
     /// @dev Recovers the address which signed a payload including the given node's address
-    function recoverSigner(address _node, uint8 _v, bytes32 _r, bytes32 _s) internal view returns(address) {
+    function recoverSigner(address _node, uint8 _v, bytes32 _r, bytes32 _s) internal pure returns(address) {
         bytes memory message = abi.encodePacked(Strings.toHexString(_node), " may delegate to me for Rocket Pool governance");
         bytes memory prefixedMessage = abi.encodePacked("\x19Ethereum Signed Message:\n", Strings.toString(message.length), message);
         bytes32 prefixedHash = keccak256(prefixedMessage);

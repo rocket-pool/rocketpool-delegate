@@ -68,11 +68,11 @@ contract RocketSignerRegistryTest is Test {
         }
     }
 
-    function sign(uint256 signerKey, address node) internal view returns (uint8 v, bytes32 r, bytes32 s) {
+    function sign(uint256 signerKey, address node) internal pure returns (uint8 v, bytes32 r, bytes32 s) {
         return vm.sign(signerKey, getSignatureDigest(node));
     }
 
-    function getSignatureDigest(address node) internal view returns(bytes32) {
+    function getSignatureDigest(address node) internal pure returns(bytes32) {
         bytes memory message = abi.encodePacked(Strings.toHexString(node), " may delegate to me for Rocket Pool governance");
         bytes memory prefixedMessage = abi.encodePacked("\x19Ethereum Signed Message:\n", Strings.toString(message.length), message);
         return keccak256(prefixedMessage);
