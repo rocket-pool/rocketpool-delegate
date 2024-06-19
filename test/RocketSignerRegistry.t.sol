@@ -13,7 +13,7 @@ contract RocketSignerRegistryTest is Test {
         registry = new RocketSignerRegistry();
     }
 
-    function setSigningDelegate(address node, uint256 signerKey) internal {
+    function setSigner(address node, uint256 signerKey) internal {
         address signer = vm.addr(signerKey);
         address inUseNode = registry.signerToNode(signer);
         address existingSigner = registry.nodeToSigner(node);
@@ -31,7 +31,7 @@ contract RocketSignerRegistryTest is Test {
         }
 
         // Attempt to set
-        registry.setSigningDelegate(signer, v, r, s);
+        registry.setSigner(signer, v, r, s);
 
         if (node == signer || inUse) {
             return;
@@ -49,7 +49,7 @@ contract RocketSignerRegistryTest is Test {
         }
     }
 
-    function clearSigningDelegate(address node) internal {
+    function clearSigner(address node) internal {
         address existingSigner = registry.nodeToSigner(node);
         bool exists = existingSigner != address(0);
 
@@ -59,7 +59,7 @@ contract RocketSignerRegistryTest is Test {
             vm.expectRevert("No signer set");
         }
 
-        registry.clearSigningDelegate();
+        registry.clearSigner();
 
         if (exists) {
             // Check both forward and reverse mapping were cleared
@@ -79,36 +79,36 @@ contract RocketSignerRegistryTest is Test {
     }
 
     function test_Set() public {
-        setSigningDelegate(vm.addr(1), 2);
+        setSigner(vm.addr(1), 2);
     }
 
     function test_Override() public {
-        setSigningDelegate(vm.addr(1), 2);
-        setSigningDelegate(vm.addr(1), 3);
+        setSigner(vm.addr(1), 2);
+        setSigner(vm.addr(1), 3);
     }
 
     function test_SetInUse() public {
-        setSigningDelegate(vm.addr(1), 2);
-        setSigningDelegate(vm.addr(3), 2);
+        setSigner(vm.addr(1), 2);
+        setSigner(vm.addr(3), 2);
     }
 
     function test_Clear() public {
-        setSigningDelegate(vm.addr(1), 2);
-        clearSigningDelegate(vm.addr(1));
+        setSigner(vm.addr(1), 2);
+        clearSigner(vm.addr(1));
     }
 
     function test_SetAfterClear() public {
-        setSigningDelegate(vm.addr(1), 2);
-        clearSigningDelegate(vm.addr(1));
-        setSigningDelegate(vm.addr(1), 2);
+        setSigner(vm.addr(1), 2);
+        clearSigner(vm.addr(1));
+        setSigner(vm.addr(1), 2);
     }
 
     function test_SetToSelf() public {
-        setSigningDelegate(vm.addr(1), 1);
+        setSigner(vm.addr(1), 1);
     }
 
     function test_ClearNonExisting() public {
-        clearSigningDelegate(vm.addr(1));
+        clearSigner(vm.addr(1));
     }
 
     function test_InvalidSignature() public {
@@ -120,6 +120,6 @@ contract RocketSignerRegistryTest is Test {
 
         vm.prank(node);
         vm.expectRevert("Invalid signature");
-        registry.setSigningDelegate(signer, v, r, s);
+        registry.setSigner(signer, v, r, s);
     }
 }

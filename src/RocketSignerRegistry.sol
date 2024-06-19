@@ -9,14 +9,14 @@ contract RocketSignerRegistry is RocketSignerRegistryInterface {
     mapping(address => address) public nodeToSigner;
     mapping(address => address) public signerToNode;
 
-    event SigningDelegateSet(address indexed nodeAddress, address signerAddress);
+    event SignerSet(address indexed nodeAddress, address signerAddress);
 
     /// @notice Sets a signing delegate for the caller
     /// @param _signer The address to which off-chain voting is delegated to for the caller
     /// @param _v v component of signature giving node permission to use the given signer
     /// @param _r r component of signature giving node permission to use the given signer
     /// @param _s s component of signature giving node permission to use the given signer
-    function setSigningDelegate(address _signer, uint8 _v, bytes32 _r, bytes32 _s) external {
+    function setSigner(address _signer, uint8 _v, bytes32 _r, bytes32 _s) external {
         require(msg.sender != _signer, "Cannot set to self");
         require(signerToNode[_signer] == address(0), "Signer address already in use");
         require(_signer != address(0), "Invalid signer");
@@ -30,11 +30,11 @@ contract RocketSignerRegistry is RocketSignerRegistryInterface {
         signerToNode[_signer] = msg.sender;
         nodeToSigner[msg.sender] = _signer;
         // Emit event
-        emit SigningDelegateSet(msg.sender, _signer);
+        emit SignerSet(msg.sender, _signer);
     }
 
     /// @notice Clears the signing delegate for the caller
-    function clearSigningDelegate() external {
+    function clearSigner() external {
         // Clear existing reverse mapping
         address previousSigner = nodeToSigner[msg.sender];
         require (previousSigner != address(0), "No signer set");
@@ -42,7 +42,7 @@ contract RocketSignerRegistry is RocketSignerRegistryInterface {
         delete signerToNode[previousSigner];
         delete nodeToSigner[msg.sender];
         // Emit event
-        emit SigningDelegateSet(msg.sender, address(0));
+        emit SignerSet(msg.sender, address(0));
     }
 
     /// @dev Recovers the address which signed a payload including the given node's address
